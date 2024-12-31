@@ -1,10 +1,9 @@
+#include "environment.hpp"
 #include "physics_ball.hpp"
 #include "physics_hex.hpp"
 #include <SFML/Graphics.hpp>
 #include <SFML/Window/Keyboard.hpp>
 #include <box2d/box2d.h>
-#include <box2d/types.h>
-#include <optional>
 
 int main() {
   auto window = sf::RenderWindow(sf::VideoMode({1920, 1080}), "Hexagon Demo");
@@ -17,11 +16,11 @@ int main() {
 
   // Draw a few hexagons in a row
   float radius = 1.0f;
-  b2Vec2 initialPosition = {5.0f, 5.0f};
+  b2Vec2 initialPosition = {0.0f, 5.0f};
   sf::Color color = sf::Color::Yellow;
   std::vector<std::unique_ptr<PhysicsHex>> hexagons;
 
-  for (int i = 0; i < 10; i++) {
+  for (int i = 0; i < 50; i++) {
     auto hex = createPhysicsHex(worldId, initialPosition, radius, color);
     hexagons.push_back(std::move(hex));
     initialPosition.x += radius * 2;
@@ -37,9 +36,21 @@ int main() {
   while (window.isOpen()) {
     sf::Time elapsedTime = clock.restart();
 
+    // Update physics
+    b2World_Step(worldId, timeStep, 4);
+    physicsBall->update();
+
     while (const auto event = window.pollEvent()) {
       if (event->is<sf::Event::Closed>()) {
         window.close();
+
+      } else if (const auto *mouseButton =
+                     event->getIf<sf::Event::MouseButtonPressed>()) {
+        if (mouseButton->button == sf::Mouse::Button::Left) {
+          auto mousePosition = mouseButton->position;
+          auto worldPosition = Environment::pixelsToMeters(mousePosition);
+          physicsBall->setPosition(worldPosition);
+        }
       }
 
       else if (const auto *keyPressed = event->getIf<sf::Event::KeyPressed>()) {
@@ -48,10 +59,6 @@ int main() {
         }
       }
     }
-
-    // Update physics
-    b2World_Step(worldId, timeStep, 4);
-    physicsBall->update();
 
     // Draw world
     window.clear();

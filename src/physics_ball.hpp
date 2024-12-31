@@ -19,6 +19,7 @@ public:
 
   void draw(sf::RenderTarget &target) const;
 
+  void setPosition(b2Vec2 position);
   b2Vec2 getPosition() const { return position; }
   b2BodyId getBodyId() const { return bodyId; }
   void update();

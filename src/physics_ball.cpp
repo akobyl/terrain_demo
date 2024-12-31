@@ -1,5 +1,6 @@
 #include "physics_ball.hpp"
 #include "environment.hpp"
+#include <box2d/box2d.h>
 #include <box2d/types.h>
 
 PhysicsBall::PhysicsBall(b2WorldId worldId, b2Vec2 position, float radius,
@@ -24,6 +25,13 @@ PhysicsBall::PhysicsBall(b2WorldId worldId, b2Vec2 position, float radius,
   // center
   b2Circle ballCircle = {{0.0f, 0.0f}, radius};
   b2CreateCircleShape(bodyId, &ballShapeDef, &ballCircle);
+}
+
+void PhysicsBall::setPosition(b2Vec2 position) {
+  this->position = position;
+  b2Body_SetTransform(bodyId, position, b2Body_GetRotation(bodyId));
+  b2Body_SetLinearVelocity(bodyId, {0.0f, -0.01f});
+  b2Body_SetAngularVelocity(bodyId, 0.0f);
 }
 
 void PhysicsBall::update() {
