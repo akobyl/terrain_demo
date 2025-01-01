@@ -53,11 +53,19 @@ enable_testing()
 add_executable(
   TerrainDemoTest
   test/test_main.cpp
+  src/physics_hex.cpp
+  src/physics_ball.cpp
 )
 
 target_link_libraries(
   TerrainDemoTest
   GTest::gtest_main
+  SFML::Graphics
+  box2d
+)
+
+target_include_directories(TerrainDemoTest PRIVATE
+  ${CMAKE_SOURCE_DIR}/src
 )
 
 include(GoogleTest)
